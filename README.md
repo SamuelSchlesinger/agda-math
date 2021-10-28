@@ -1,3 +1,3 @@
-# Circuits in Haskell
+# Circuits!
 
-A construction of alternating circuits in Haskell.
+Functional circuit constructions
