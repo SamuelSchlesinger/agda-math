@@ -1,3 +1,6 @@
+id : {A : Set} -> A -> A
+id x = x
+
 -- Booleans
 
 data B : Set where
@@ -36,6 +39,11 @@ sym refl = refl
 trans : {A : Set} -> {a : A} -> {b : A} -> {c : A} -> (a == b) -> (b == c) -> (a == c)
 trans refl refl = refl
 
+_∙_ : {A : Set} -> {a : A} -> {b : A} -> {c : A} -> (a == b) -> (b == c) -> (a == c)
+_∙_ = trans
+
+infixr 0 _∙_
+
 fun : {A : Set} -> {a : A} -> {b : A} -> (f : A -> A) -> (a == b) -> (f a == f b)
 fun f refl = refl
 
@@ -50,6 +58,7 @@ leftSub f a a' refl refl = refl
 data N : Set where
   S : N -> N
   Z : N
+{-# BUILTIN NATURAL N #-}
 
 _+_ : N -> N -> N
 Z + m = m
@@ -91,15 +100,10 @@ lemma1 : (n : N) -> (m : N) -> n + n * m == n * S m
 lemma1 Z m = refl 
 lemma1 (S n) m =
   fun S
-    (trans
-      (trans
-        (addAssociative n m (n * m))
-          (trans
-            (fun (\x -> x + n * m)
-            (addCommutative n m))
-          (sym (addAssociative m n (n * m))))
-      )
-      (fun (\x -> m + x) (lemma1 n m))
+    ( addAssociative n m (n * m)
+    ∙ fun (\x -> x + n * m) (addCommutative n m)
+    ∙ sym (addAssociative m n (n * m))
+    ∙ fun (\x -> m + x) (lemma1 n m)
     )
 
 mulCommutative : (n : N) -> (m : N) -> n * m == m * n
@@ -110,13 +114,13 @@ distributive : (a : N) -> (n : N) -> (m : N) -> a * (n + m) == a * n + a * m
 distributive Z n m = refl
 distributive (S a) n m =
   leftSub (\x -> (n + m) + x) (a * n + a * m) (a * (n + m)) (sym (distributive a n m))
-    (trans (sym (addAssociative n m (a * n + a * m)))
-    (trans
-      (fun (\x -> n + x)
-        (trans (addAssociative m (a * n) (a * m))
-        (trans (fun (\x -> x + a * m) (addCommutative m (a * n)))
-        (sym (addAssociative (a * n) m (a * m))))))
-    (addAssociative n (a * n) (m + a * m))))
+    ( (sym (addAssociative n m (a * n + a * m)))
+    ∙ fun (\x -> n + x)
+        ( addAssociative m (a * n) (a * m)
+        ∙ fun (\x -> x + a * m) (addCommutative m (a * n))
+        ∙ sym (addAssociative (a * n) m (a * m)))
+    ∙ (addAssociative n (a * n) (m + a * m))
+    )
 
 -- Hyperoperations
 
@@ -133,7 +137,10 @@ hypAddition x (S y) = fun S (hypAddition x y)
 
 hypMultiplication : (x : N) -> (y : N) -> hyp (S (S Z)) x y == y * x
 hypMultiplication x Z = refl
-hypMultiplication x (S y) = trans (hypAddition x (hyp (S (S Z)) x y)) (trans (addCommutative (hyp (S (S Z)) x y) x) (fun (\a -> x + a) (hypMultiplication x y)))
+hypMultiplication x (S y) =
+    hypAddition x (hyp (S (S Z)) x y)
+  ∙ addCommutative (hyp (S (S Z)) x y) x
+  ∙ fun (\a -> x + a) (hypMultiplication x y)
 
 data Vector : N -> Set -> Set where
   Cons : {n : N} {A : Set} -> (a : A) -> Vector n A -> Vector (S n) A
@@ -182,4 +189,14 @@ executeGates (Cons g gs) v = Cons (executeGate g v) (executeGates gs v)
 execute : {d n m : N} -> Circuit d n m -> Vector n B -> Vector m B
 execute (Layer g gates c) i = executeGates gates (execute c i)
 execute Inputs i = i
+
+uncurryVec : {A B : Set} -> (A -> A -> B) -> Vector (S (S Z)) A -> B
+uncurryVec f (Cons a (Cons b Nil)) = f a b
+
+executeInputs : {n : N} {i : Vector n B} -> execute (Inputs {n}) i == i
+executeInputs = refl
+
+depthZeroAreInputs : {n : N} -> (c : Circuit Z n n) -> c == Inputs {n}
+depthZeroAreInputs Inputs = refl
+
 
