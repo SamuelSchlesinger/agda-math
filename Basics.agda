@@ -22,7 +22,7 @@ _∙_ = trans
 
 infixr 0 _∙_
 
-fun : {A : Set} -> {a : A} -> {b : A} -> (f : A -> A) -> (a == b) -> (f a == f b)
+fun : {A B : Set} -> {a : A} -> {b : A} -> (f : A -> B) -> (a == b) -> (f a == f b)
 fun f refl = refl
 
 subst : {A : Set} (C : A -> Set) {x y : A} -> x == y -> C x -> C y

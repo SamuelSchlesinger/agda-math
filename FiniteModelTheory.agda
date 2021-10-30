@@ -21,6 +21,15 @@ data RelationsFor : (size : N) -> (r : N) -> Vector r N -> Set where
     -> RelationsFor size (S r) (Cons r0 R)
   RNil : {size : N} -> RelationsFor size 0 Nil
 
+relationFor :
+  { size r : N } { R : Vector r N }
+  -> RelationsFor size r R
+  -> (ri : Fin r)
+  -> N & (\m -> Vector m (Vector (index ri R) (Fin size)))
+relationFor (RCons m db rs) UZ = Pair m db
+relationFor (RCons m db rs) (US u) = relationFor rs u
+
+
 record Structure (v : Vocabulary) : Set where
   open Vocabulary
   field
@@ -62,6 +71,6 @@ truth A i FO⊤ = true
 truth A i (v FO= w) = i v ==Fin i w
 truth A i (a FO∧ b) = and (truth A i a) (truth A i b)
 truth A i (FO¬ a) = not (truth A i a)
-truth A i (FOR ri applied) = ? -- TODO: look up ri in the structure and check if the row is present
+truth A i (FOR ri applied) = ? where -- TODO: look up ri in the structure and check if the row is present
 truth A i (FO∃ v a) = ?        -- TODO: iterate through all of the elements of the structure, checking
                                -- if the property holds for each of them
