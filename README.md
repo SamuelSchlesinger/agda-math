@@ -1,3 +1,1 @@
-# Circuits!
-
-Functional circuit constructions
+# Defunct (in favor of the general purpose math repository)
