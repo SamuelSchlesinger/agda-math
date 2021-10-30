@@ -13,6 +13,11 @@ _+_ : N -> N -> N
 Z + m = m
 S n + m = S (n + m)
 
+_==N_ : N -> N -> B
+_==N_ Z Z = true
+_==N_ (S n) (S m) = n ==N m
+_==N_ _ _ = false
+
 infixr 4 _+_
 
 addLeftIdentity : (n : N) -> Z + n == n
@@ -98,6 +103,11 @@ hypMultiplication x (S y) =
 data Fin : N -> Set where
   US : {n : N} -> Fin n -> Fin (S n)
   UZ : {n : N} -> Fin (S n)
+
+_==Fin_ : {n : N} -> Fin n -> Fin n -> B
+_==Fin_ UZ UZ = true
+_==Fin_ (US n) (US m) = n ==Fin m
+_==Fin_ _ _ = false
 
 finForgetS : (n : N) -> Fin n -> Fin (S n)
 finForgetS (S n) UZ = UZ

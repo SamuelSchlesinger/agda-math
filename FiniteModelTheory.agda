@@ -51,9 +51,17 @@ data FO (v : Vocabulary) : Set where
   _FO=_ : N -> N -> FO v
   _FO∧_ : FO v -> FO v -> FO v
   FO¬ : FO v -> FO v
-  FO∃ : FO v -> FO v
-  FOR : (x : Fin (Vocabulary.r v)) -> Vector (index x (Vocabulary.R v)) N -> FO v
+  FO∃ : N -> FO v -> FO v
+  FOR : (ri : Fin (Vocabulary.r v)) -> Vector (index ri (Vocabulary.R v)) N -> FO v
 
 InterpretationInto : {vocab : Vocabulary} -> (structure : Structure vocab) -> Set
 InterpretationInto structure = N -> Fin (Structure.size structure)
-  
+
+truth : {v : Vocabulary} -> (structure : Structure v) -> InterpretationInto structure -> FO v -> B
+truth A i FO⊤ = true
+truth A i (v FO= w) = i v ==Fin i w
+truth A i (a FO∧ b) = and (truth A i a) (truth A i b)
+truth A i (FO¬ a) = not (truth A i a)
+truth A i (FOR ri applied) = ? -- TODO: look up ri in the structure and check if the row is present
+truth A i (FO∃ v a) = ?        -- TODO: iterate through all of the elements of the structure, checking
+                               -- if the property holds for each of them
