@@ -19,6 +19,6 @@ foldr : {n : N} {A B : Set} -> (A -> B -> B) -> Vector n A -> B -> B
 foldr f Nil b = b
 foldr f (Cons a as) b = f a (foldr f as b)
 
-index : {n : N} {A : Set} -> Fin n -> Vector (S n) A -> A
+index : {n : N} {A : Set} -> Fin n -> Vector n A -> A
 index UZ (Cons a _) = a
 index (US i) (Cons _ as) = index i as

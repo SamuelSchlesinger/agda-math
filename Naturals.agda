@@ -97,14 +97,13 @@ hypMultiplication x (S y) =
 
 data Fin : N -> Set where
   US : {n : N} -> Fin n -> Fin (S n)
-  UZ : {n : N} -> Fin n
+  UZ : {n : N} -> Fin (S n)
 
 finForgetS : (n : N) -> Fin n -> Fin (S n)
-finForgetS Z UZ = UZ
 finForgetS (S n) UZ = UZ
 finForgetS (S n) (US u) = US (finForgetS n u)
 
-maxFin : (n : N) -> Fin n
+maxFin : (n : N) -> Fin (S n)
 maxFin Z = UZ
 maxFin (S n) = US (maxFin n)
 
@@ -160,8 +159,3 @@ plusLeq (S a) n m (MkLeq d refl) = monotoneS (a + n) (a + d + n)
 unFinLeq : (n : N) -> (u : Fin n) -> unFin u <= n
 unFinLeq n (US {n1} a) = monotoneS (unFin a) n1 (unFinLeq n1 a)
 unFinLeq n UZ = zeroBottom n
-
-diff : (n : N) -> (m : N) -> m <= n -> Fin n
-diff Z m pf = UZ
-diff n Z pf = maxFin n
-diff (S n) (S m) pf = finForgetS n (diff n m (stripS m n pf))
