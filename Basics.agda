@@ -102,6 +102,12 @@ data _SuchThat_ : (A : Set) -> (f : A -> B) -> Set where
 data _&_ : (A : Set) -> (f : A -> Set) -> Set where
   Pair : {A : Set} {f : A -> Set} -> (a : A) -> (b : f a) -> A & f
 
+fst : { A : Set } { f : A -> Set } -> A & f -> A
+fst (Pair a _) = a
+
+snd : { A : Set } { f : A -> Set } -> (p : A & f) -> f (fst p)
+snd (Pair _ b) = b
+
 uncurry : { A X : Set} {f : A -> Set} -> (g : (a : A) -> (b : f a) -> X) -> (A & f -> X)
 uncurry g (Pair a b) = g a b
 

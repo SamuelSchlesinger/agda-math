@@ -71,6 +71,18 @@ truth A i FO⊤ = true
 truth A i (v FO= w) = i v ==Fin i w
 truth A i (a FO∧ b) = and (truth A i a) (truth A i b)
 truth A i (FO¬ a) = not (truth A i a)
-truth A i (FOR ri applied) = ? where -- TODO: look up ri in the structure and check if the row is present
-truth A i (FO∃ v a) = ?        -- TODO: iterate through all of the elements of the structure, checking
-                               -- if the property holds for each of them
+truth A i (FOR ri applied) =
+  foldr (\xs -> or (eqVector _==Fin_ xs (mapVec i applied)))
+    (snd (relationFor (Structure.relations A) ri))
+    false
+truth A i (FO∃ v a) =
+  foldr (\x b -> and b (truth A (extend A v x i) a)) (enumerateFin (Structure.size A)) false
+  where
+    extend :
+      {v : Vocabulary }
+      -> (A : Structure v)
+      -> N
+      -> Fin (Structure.size A)
+      -> InterpretationInto A
+      -> InterpretationInto A
+    extend A v x i k = if k ==N v then x else i k -- HELP!
