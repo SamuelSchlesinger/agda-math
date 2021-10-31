@@ -85,4 +85,4 @@ truth A i (FO∃ v a) =
       -> Fin (Structure.size A)
       -> InterpretationInto A
       -> InterpretationInto A
-    extend A v x i k = if k ==N v then x else i k -- HELP!
+    extend A v x i k = if k ==N v then x else (i k)
